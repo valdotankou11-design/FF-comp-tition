@@ -197,7 +197,11 @@ def create_tournament():
             'prize_3':         body.get('prize_3','110 Diamants'),
             'status':          'open',
         }).execute()
-        return jsonify({'success':True,'tournament':res.data[0]})
+        print(res)
+        return jsonify({
+    'success': True,
+    'tournament': res.data[0] if res.data else None
+})
     except Exception as e:
         return jsonify({'error':str(e)}), 500
 
