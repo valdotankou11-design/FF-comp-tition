@@ -198,9 +198,11 @@ def create_tournament():
             'status':          'open',
         }).execute()
         print(res)
+        print(res.data)
         return jsonify({
     'success': True,
     'tournament': res.data[0] if res.data else None
+     'players_count': 0       
 })
     except Exception as e:
         return jsonify({'error':str(e)}), 500
