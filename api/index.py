@@ -186,7 +186,7 @@ def create_tournament():
     try:
         sb = get_sb()
         sb.table('tournaments').update({'status':'archived'}).neq('status','archived').execute()
-        sb.table('players').update({'group_name':None,'score':0}).execute()
+        sb.table('players').update({'group_name':None,'score':0})\.not_.is_('group_name', None).execute()
         res = sb.table('tournaments').insert({
             'name':            body.get('name','Tournoi Free Fire'),
             'date':            body.get('date') or None,
@@ -217,7 +217,7 @@ def draw_groups():
         t       = t_row.data[0]
         players = sb.table('players').select('*').execute().data
         if not players: return jsonify({'error':'Aucun joueur inscrit'}), 400
-        sb.table('players').update({'group_name':None}).execute()
+        sb.table('players').update({'group_name':None}).not_.is_('group_name', None).execute()
         random.shuffle(players)
         ppg = t['players_per_group']
         letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
