@@ -6,9 +6,6 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
-        "includeFiles": [
-          "templates/index.html"
-        ]
       }
     }
   ],
