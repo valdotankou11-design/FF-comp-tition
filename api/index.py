@@ -302,16 +302,12 @@ def get_stats():
         return jsonify({'leaderboard': res.data})
     except:
         return jsonify({'leaderboard':[]})
-
+# pour Vercel
+application = app
 # ── HEALTH CHECK ──
 
 @app.route('/api/health')
 def health():
     return jsonify({'status':'ok','version':'2.0'})
-# pour Vercel
-application = app
-
 if __name__ == '__main__':
     app.run(debug=True)
-# Exposition pour Vercel
-application = app
