@@ -20,6 +20,8 @@ SUPABASE_KEY   = os.environ.get("OLD_SUPABASE_KEY",   "eyJhbGciOiJIUzI1NiIsInR5c
 # ── Vercel KV (FF Tournoi v3) ──
 KV_REST_API_URL   = os.environ.get("KV_REST_API_URL",   "https://ideal-monarch-91620.upstash.io")
 KV_REST_API_TOKEN = os.environ.get("KV_REST_API_TOKEN", "gQAAAAAAAWXkAAIgcDJjZWFmNGU1MDVlN2E0ODZjODNhYzcwMGQ4NWNkY2IyZQ")
+KV_HOST = "ideal-monarch-91620.upstash.io"
+KV_TOKEN = "gQAAAAAAAWXkAAIgcDJjZWFmNGU1MDVlN2E0ODZjODNhYzcwMGQ4NWNkY2IyZQ"
 
 # ══════════════════════════════════════════════
 #  Supabase — lecture de la table players
