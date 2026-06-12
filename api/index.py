@@ -14,7 +14,7 @@ ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin1234')
 #  HTML (embarqué depuis le fichier statique)
 # ══════════════════════════════════════════════
 
-_HTML_PATH = os.path.join(os.path.dirname(__file__), '..', 'public', 'index.html')
+_HTML_PATH = os.path.join(os.path.dirname(__file__), '..', 'Public', 'index.html')
 
 def get_html():
     with open(_HTML_PATH, 'r', encoding='utf-8') as f:
