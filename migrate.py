@@ -16,8 +16,7 @@ import os, json, hashlib, urllib.request
 
 # ── Supabase (FF-comp-tition) ──
 SUPABASE_URL   = os.environ.get("OLD_SUPABASE_URL",   "https://XXXX.supabase.co")
-SUPABASE_KEY   = os.environ.get("OLD_SUPABASE_KEY",   "eyJhbGc...")   # anon ou service_role key
-
+SUPABASE_KEY   = os.environ.get("OLD_SUPABASE_KEY",   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdhZWFrZXFjeXJ3YWtsZWN6dGFwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODkzMzI2NSwiZXhwIjoyMDk0NTA5MjY1fQ.N97NlsoT3vtRZQZz8n5EuMoh6m_2a8lN7cfifB8RaLU")   # anon ou service_role key
 # ── Vercel KV (FF Tournoi v3) ──
 KV_REST_API_URL   = os.environ.get("KV_REST_API_URL",   "https://XXXX.kv.vercel-storage.com")
 KV_REST_API_TOKEN = os.environ.get("KV_REST_API_TOKEN", "XXXX")
