@@ -8,7 +8,7 @@ Usage :
   3. python migrate.py
 """
 
-import os, json, hashlib, urllib.request
+import os, json, hashlib, urllib.request, requests
 
 # ══════════════════════════════════════════════
 #  🔧 CONFIGURATION — à remplir
@@ -60,7 +60,17 @@ def kv_get(key):
         return None
 
 def kv_set(key, value):
-    kv_request("POST", "/set", [key, json.dumps(value)])
+    serialized = json.dumps(value)
+    r = requests.post(
+        f"https://{KV_HOST}/set/{key}",
+        headers={
+            "Authorization": f"Bearer {KV_TOKEN}",
+            "Content-Type": "application/json"
+        },
+        data=json.dumps(serialized)
+    )
+    if r.status_code != 200:
+        raise Exception(f"HTTP Error {r.status_code}: {r.text}")
 
 # ══════════════════════════════════════════════
 #  Mapping des colonnes Supabase → format KV
