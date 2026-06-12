@@ -1,10 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Tournoi Free Fire</title>
+<title>FF Tournoi</title>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#f5a623"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="FF Tournoi"/>
+<link rel="apple-touch-icon" href="/icons/icon-192.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Bebas+Neue&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -202,6 +207,35 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.95);
 
 /* ── CREATE TOURNAMENT MODAL ── */
 #create-tournament-form .form-row{grid-template-columns:1fr 1fr}
+
+/* ── MATCHS ── */
+.matches-group{margin-bottom:28px}
+.matches-group-header{font-family:'Bebas Neue';font-size:20px;letter-spacing:3px;color:var(--gold);
+  padding:10px 0 6px;border-bottom:2px solid rgba(245,166,35,.3);margin-bottom:14px}
+.match-row{display:flex;align-items:center;gap:10px;background:var(--dark3);border-radius:8px;
+  padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06);flex-wrap:wrap}
+.match-players{display:flex;align-items:center;gap:8px;flex:1;min-width:180px}
+.match-pseudo{font-family:'Rajdhani';font-size:15px;font-weight:700;color:var(--white);max-width:110px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.match-vs{font-family:'Bebas Neue';font-size:18px;color:var(--gold);letter-spacing:2px;padding:0 4px}
+.match-scores{display:flex;align-items:center;gap:6px}
+.match-score-input{width:56px;background:var(--dark4);border:1px solid rgba(245,166,35,.3);
+  color:var(--white);font-family:'Orbitron';font-size:14px;text-align:center;padding:4px 6px;
+  border-radius:4px}
+.match-score-sep{font-family:'Bebas Neue';font-size:18px;color:var(--gray)}
+.match-save-btn{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border:none;
+  padding:6px 14px;border-radius:4px;font-family:'Rajdhani';font-size:13px;font-weight:700;
+  cursor:pointer;letter-spacing:1px;white-space:nowrap}
+.match-save-btn:hover{opacity:.85}
+.match-played{font-size:11px;color:#22c55e;font-family:'Rajdhani';font-weight:700;letter-spacing:1px;margin-left:4px}
+.match-result{font-family:'Orbitron';font-size:15px;font-weight:700;color:var(--gold);
+  background:var(--dark4);padding:4px 12px;border-radius:4px;white-space:nowrap}
+.standings-table{width:100%;border-collapse:collapse;margin-top:16px;font-family:'Rajdhani'}
+.standings-table th{font-family:'Bebas Neue';font-size:14px;letter-spacing:1px;color:var(--gray);
+  padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.1);text-align:left}
+.standings-table td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.05);font-size:14px}
+.standings-table tr:first-child td{color:var(--gold);font-weight:700}
+.standings-rank{font-family:'Bebas Neue';font-size:18px;width:30px}
 </style>
 </head>
 <body>
@@ -263,6 +297,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.95);
   <div class="tabs">
     <button class="tab active" onclick="switchTab('tournament')">🏆 Tournoi</button>
     <button class="tab" onclick="switchTab('groups')">🎯 Poules</button>
+    <button class="tab" onclick="switchTab('matches')">⚔️ Matchs</button>
     <button class="tab" id="tab-players-btn" style="display:none" onclick="switchTab('players')">👥 Joueurs</button>
   </div>
 
@@ -279,6 +314,14 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.95);
     <div class="section-title">GROUPES DE POULES</div>
     <div id="groups-content">
       <div class="empty-groups">Les poules seront affichées après le tirage au sort.</div>
+    </div>
+  </div>
+
+  <!-- TAB: MATCHES -->
+  <div class="tab-content" id="tab-matches">
+    <div class="section-title">MATCHS PAR POULE</div>
+    <div id="matches-content">
+      <div class="empty-groups">Les matchs seront générés après le tirage des poules.</div>
     </div>
   </div>
 
@@ -618,7 +661,7 @@ async function loadPlayers(){
   }
   el.innerHTML=`<table class="players-table">
     <thead><tr>
-      <th>#</th><th>Pseudo</th><th>ID FF</th><th>Email</th><th>WhatsApp</th><th>Groupe</th><th>Inscrit le</th>
+      <th>#</th><th>Pseudo</th><th>ID FF</th><th>Email</th><th>WhatsApp</th><th>Groupe</th><th>Inscrit le</th><th>Action</th>
     </tr></thead>
     <tbody>${d.players.map((p,i)=>`<tr>
       <td style="color:var(--gray)">${i+1}</td>
@@ -628,29 +671,194 @@ async function loadPlayers(){
       <td style="color:var(--gray);font-size:13px">${p.whatsapp}</td>
       <td>${p.group?`<span class="badge open">${p.group}</span>`:'<span style="color:var(--gray)">—</span>'}</td>
       <td style="color:var(--gray);font-size:12px">${new Date(p.registered_at).toLocaleDateString('fr-FR')}</td>
+      <td><button class="admin-btn danger" style="padding:4px 8px;font-size:11px" onclick="doDeletePlayer('${p.email}')">🗑️</button></td>
     </tr>`).join('')}</tbody>
   </table>`;
+}
+
+// ── DELETE PLAYER ──
+async function doDeletePlayer(email){
+  if(!confirm('Supprimer ce joueur ?'))return;
+  const r=await fetch('/api/players/'+encodeURIComponent(email),{method:'DELETE'});
+  const d=await r.json();
+  if(d.success){toast('Joueur supprimé ✓');loadPlayers();}
+  else toast(d.error||'Erreur','error');
+}
+
+
+// ══════════════════════════════════════════════
+//  MATCHS
+// ══════════════════════════════════════════════
+
+async function doGenerateMatches(){
+  if(!confirm('Générer les matchs round-robin pour chaque poule ?'))return;
+  const r=await fetch('/api/matches/generate',{method:'POST'});
+  const d=await r.json();
+  if(d.success){toast(`⚔️ ${d.total_matches} matchs générés !`);switchTab('matches');}
+  else toast(d.error||'Erreur','error');
+}
+
+async function loadMatches(){
+  const [mr, gr] = await Promise.all([
+    fetch('/api/matches').then(r=>r.json()),
+    fetch('/api/groups').then(r=>r.json())
+  ]);
+  const el = document.getElementById('matches-content');
+  const matches = mr.matches || {};
+  const groups  = gr.groups  || {};
+
+  if(!Object.keys(matches).length){
+    el.innerHTML='<div class="empty-groups">Aucun match généré.<br><small style="color:#666">Utilise le bouton ⚔️ Générer les matchs après le tirage.</small></div>';
+    return;
+  }
+
+  let html='';
+  for(const [gname, matchList] of Object.entries(matches).sort()){
+    // Classement de la poule
+    const members = (groups[gname]?.members || []).slice().sort((a,b)=>b.score-a.score);
+    const played  = matchList.filter(m=>m.played).length;
+
+    html+=`<div class="matches-group">
+      <div class="matches-group-header">⚔️ ${gname} — ${played}/${matchList.length} matchs joués</div>`;
+
+    // Liste des matchs
+    matchList.forEach((m,idx)=>{
+      const s1 = m.score_p1 ?? '';
+      const s2 = m.score_p2 ?? '';
+      const resultHtml = m.played
+        ? `<span class="match-result">${m.score_p1} — ${m.score_p2}</span><span class="match-played">✓ JOUÉ</span>`
+        : '';
+      const inputsHtml = isAdmin
+        ? `<div class="match-scores">
+            <input class="match-score-input" id="ms1-${gname}-${idx}" type="number" min="0" value="${s1}" placeholder="0"/>
+            <span class="match-score-sep">—</span>
+            <input class="match-score-input" id="ms2-${gname}-${idx}" type="number" min="0" value="${s2}" placeholder="0"/>
+            <button class="match-save-btn" onclick="saveMatchScore('${gname}',${idx})">SAUVER</button>
+          </div>`
+        : (m.played ? `<span class="match-result">${m.score_p1} — ${m.score_p2}</span>` : '<span style="color:#666;font-size:12px">À jouer</span>');
+
+      html+=`<div class="match-row">
+        <div class="match-players">
+          <span class="match-pseudo" title="${m.p1_pseudo}">${m.p1_pseudo}</span>
+          <span class="match-vs">VS</span>
+          <span class="match-pseudo" title="${m.p2_pseudo}">${m.p2_pseudo}</span>
+        </div>
+        ${isAdmin ? inputsHtml : (m.played ? `<span class="match-result">${m.score_p1} — ${m.score_p2}</span><span class="match-played">✓</span>` : '<span style="color:#666;font-size:12px">À jouer</span>')}
+      </div>`;
+    });
+
+    // Classement de la poule
+    if(members.length){
+      html+=`<table class="standings-table"><thead><tr>
+        <th>#</th><th>Joueur</th><th>Pts Poule</th>
+      </tr></thead><tbody>`;
+      members.forEach((m,i)=>{
+        const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+        html+=`<tr>
+          <td class="standings-rank">${medal}</td>
+          <td>${m.pseudo}</td>
+          <td style="color:${i===0?'var(--gold)':'var(--white)'};font-weight:${i===0?700:400}">${m.score} pts</td>
+        </tr>`;
+      });
+      html+=`</tbody></table>`;
+    }
+    html+=`</div>`;
+  }
+  el.innerHTML=html;
+}
+
+async function saveMatchScore(group, idx){
+  const s1 = document.getElementById(`ms1-${group}-${idx}`)?.value;
+  const s2 = document.getElementById(`ms2-${group}-${idx}`)?.value;
+  if(s1===''||s2===''||s1===null||s2===null){toast('Entre les deux scores','error');return;}
+  const r=await fetch('/api/matches/score',{method:'PATCH',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({group,match_idx:idx,score_p1:parseInt(s1),score_p2:parseInt(s2)})});
+  const d=await r.json();
+  if(d.success){toast('Match mis à jour ✅');loadMatches();loadGroups();}
+  else toast(d.error||'Erreur','error');
 }
 
 // ── TABS ──
 function switchTab(name){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-  const tabs=['tournament','groups','players'];
+  const tabs=['tournament','groups','matches','players'];
   const idx=tabs.indexOf(name);
   document.querySelectorAll('.tab')[idx]?.classList.add('active');
   document.getElementById(`tab-${name}`)?.classList.add('active');
   if(name==='players')loadPlayers();
   if(name==='groups')loadGroups();
+  if(name==='matches')loadMatches();
 }
 
 async function loadAll(){
   await loadTournament();
   await loadGroups();
+  await loadMatches();
 }
 
 // ── INIT ──
 checkMe();
+</script>
+
+<!-- PWA Install Banner -->
+<div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:500;
+  background:linear-gradient(135deg,#1a1a1a,#111);border-top:2px solid rgba(245,166,35,.4);
+  padding:14px 20px;display:none;align-items:center;justify-content:space-between;gap:12px;
+  flex-wrap:wrap;backdrop-filter:blur(12px)">
+  <div style="display:flex;align-items:center;gap:12px">
+    <span style="font-size:28px">🔥</span>
+    <div>
+      <div style="font-family:'Bebas Neue';font-size:18px;color:#f5a623;letter-spacing:2px">INSTALLER L'APP</div>
+      <div style="font-size:12px;color:#888">Accès rapide depuis ton écran d'accueil</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button onclick="dismissPWA()" style="background:none;border:1px solid rgba(255,255,255,.2);color:#888;
+      padding:8px 16px;border-radius:4px;font-family:'Rajdhani';font-size:13px;cursor:pointer">Plus tard</button>
+    <button onclick="installPWA()" style="background:linear-gradient(135deg,#f5a623,#ff6b00);color:#000;border:none;
+      padding:8px 20px;border-radius:4px;font-family:'Rajdhani';font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px">INSTALLER</button>
+  </div>
+</div>
+
+<script>
+// ── SERVICE WORKER ──
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(r=>console.log('[SW] Registered',r.scope))
+      .catch(e=>console.warn('[SW] Failed',e));
+  });
+}
+
+// ── PWA INSTALL ──
+let _deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _deferredPrompt = e;
+  const banner = document.getElementById('pwa-banner');
+  if(banner && !localStorage.getItem('pwa-dismissed')){
+    banner.style.display = 'flex';
+  }
+});
+window.addEventListener('appinstalled', () => {
+  const banner = document.getElementById('pwa-banner');
+  if(banner) banner.style.display = 'none';
+  _deferredPrompt = null;
+});
+function installPWA(){
+  if(!_deferredPrompt) return;
+  _deferredPrompt.prompt();
+  _deferredPrompt.userChoice.then(c => {
+    _deferredPrompt = null;
+    document.getElementById('pwa-banner').style.display = 'none';
+  });
+}
+function dismissPWA(){
+  document.getElementById('pwa-banner').style.display = 'none';
+  localStorage.setItem('pwa-dismissed','1');
+}
 </script>
 </body>
 </html>
