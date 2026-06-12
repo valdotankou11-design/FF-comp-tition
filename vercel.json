@@ -6,7 +6,7 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "10mb",
-        "includeFiles": ["Public/**"]
+        "includeFiles": ["public/**"]
       }
     }
   ],
